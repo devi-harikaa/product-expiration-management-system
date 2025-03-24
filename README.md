@@ -45,5 +45,3 @@ Access the dashboard at http://localhost:3000
 
 Contributing
 We welcome contributions! If you have ideas for improvements, feel free to open an issue or submit a pull request.
-
-License
