@@ -3,11 +3,11 @@
 This project is designed to **automate inventory management** for businesses dealing with perishable goods such as food, medicines, and cosmetics. It helps reduce product wastage, optimize sales, and improve operational efficiency through **automated expiration tracking, product recommendations, and dynamic promotional offers**.  
 
 #### **Features**  
-✔ **Automated Expiration Tracking** – Receive alerts for products nearing expiration to minimize waste.  
-✔ **Market Basket Analysis** – Uses association rule mining to recommend frequently purchased product combinations.  
-✔ **Intelligent Offer Generation** – Creates dynamic discounts based on purchasing patterns and product expiration timelines.  
-✔ **User-Friendly Dashboard** – Provides real-time insights into stock levels, expiry alerts, and recommended actions.  
-✔ **Data-Driven Decisions** – Helps businesses optimize inventory and marketing strategies.  
+- **Automated Expiration Tracking** – Receive alerts for products nearing expiration to minimize waste.  
+- **Market Basket Analysis** – Uses association rule mining to recommend frequently purchased product combinations.  
+- **Intelligent Offer Generation** – Creates dynamic discounts based on purchasing patterns and product expiration timelines.  
+- **User-Friendly Dashboard** – Provides real-time insights into stock levels, expiry alerts, and recommended actions.  
+- **Data-Driven Decisions** – Helps businesses optimize inventory and marketing strategies.  
 
 #### **Technology Stack**  
 - **Frontend:** HTML, CSS, JavaScript  
