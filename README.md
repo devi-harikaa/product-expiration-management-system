@@ -1,4 +1,4 @@
-### **Product Inventory Expiration and Recommendation System**  
+### **Product Expiration Management System**  
 
 This project is designed to **automate inventory management** for businesses dealing with perishable goods such as food, medicines, and cosmetics. It helps reduce product wastage, optimize sales, and improve operational efficiency through **automated expiration tracking, product recommendations, and dynamic promotional offers**.  
 
