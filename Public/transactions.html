@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transactions</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="nav-menu">
+      <a href="/dashboard.html">Dashboard</a>
+      <a href="/add-product.html">Add Product</a>
+      <a href="/view-products.html">View Products</a>
+      <a href="/notifications.html">Notifications</a>
+       <a href="/transactions.html">Transactions</a>
+      <a href="/recommendations.html">Recommendations</a>
+      <a href="/product-management-system.html" onclick="logout()">Logout</a>
+  </div>
+
+  <div class="container">
+      <h1>Transactions</h1>
+      
+      <!-- Form to add transactions -->
+      <form id="transactionForm">
+          <label for="invoiceId">Invoice ID:</label>
+          <input type="text" id="invoiceId" required placeholder="INV-1001">
+
+          <label for="productSelect">Select Product:</label>
+          <select id="productSelect" required>
+              <option value="">-- Select Product --</option>
+          </select>
+
+          <label for="quantity">Quantity:</label>
+          <input type="number" id="quantity" min="1" required>
+
+          <button type="button" onclick="addProduct()">Add Product</button>
+
+          <h3>Selected Products</h3>
+          <ul id="selectedProducts"></ul>
+
+          <h3>Final Price: ₹<span id="finalPrice">0</span></h3>
+
+          <button type="submit">Save Transaction</button>
+      </form>
+
+      <!-- Display Transactions -->
+      <h2>Transaction History</h2>
+      <table>
+          <thead>
+              <tr>
+                  <th>Invoice ID</th>
+                  <th>Products</th>
+                  <th>Total Price (₹)</th>
+                  <th>Date</th>
+              </tr>
+          </thead>
+          <tbody id="transactionsTable"></tbody>
+      </table>
+  </div>
+
+  <script>
+      // Redirect to login page if user is not authenticated
+      if (!localStorage.getItem('currentUser')) {
+          window.location.href = '/login-page.html';
+      }
+
+      function logout() {
+          window.location.href = '/product-management-system.html';
+      }
+
+      let cart = [];
+      let finalPrice = 0;
+
+      // Fetch products from the backend and populate the product select dropdown
+      async function loadProducts() {
+          try {
+              const response = await fetch('/products');
+              const products = await response.json();
+              const productSelect = document.getElementById('productSelect');
+              productSelect.innerHTML = '<option value="">-- Select Product --</option>';
+              products.forEach(product => {
+                  productSelect.innerHTML += `<option value="${product.name}" data-price="${product.price}">${product.name} - ₹${product.price}</option>`;
+              });
+          } catch (error) {
+              console.error("Error fetching products:", error);
+          }
+      }
+
+      // Add a product to the current cart
+      function addProduct() {
+          const productSelect = document.getElementById('productSelect');
+          const quantity = parseInt(document.getElementById('quantity').value);
+          const selectedOption = productSelect.options[productSelect.selectedIndex];
+
+          if (!selectedOption.value || quantity < 1) {
+              alert("Please select a valid product and quantity.");
+              return;
+          }
+
+          const product = {
+              name: selectedOption.value,
+              price: parseFloat(selectedOption.getAttribute('data-price')),
+              quantity: quantity,
+              total: parseFloat(selectedOption.getAttribute('data-price')) * quantity
+          };
+
+          cart.push(product);
+          finalPrice += product.total;
+          document.getElementById('finalPrice').innerText = finalPrice;
+
+          const cartList = document.getElementById('selectedProducts');
+          const listItem = document.createElement('li');
+          listItem.innerText = `${product.name} - ₹${product.price} x ${product.quantity} = ₹${product.total}`;
+          cartList.appendChild(listItem);
+      }
+
+      // Save transaction by sending data to the backend /purchase endpoint
+      async function saveTransaction(event) {
+          event.preventDefault();
+          const invoiceId = document.getElementById('invoiceId').value.trim();
+
+          if (!invoiceId || cart.length === 0) {
+              alert("Please enter a valid Invoice ID and add products.");
+              return;
+          }
+
+          const transaction = {
+              invoiceId,  // Optional: You can let the backend generate one if needed.
+              products: cart
+          };
+
+          try {
+              const response = await fetch('/purchase', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(transaction)
+              });
+              const result = await response.json();
+              alert("Transaction saved successfully!");
+              // Reload transactions to reflect the new entry
+              loadTransactions();
+              // Reset form and cart
+              cart = [];
+              finalPrice = 0;
+              document.getElementById('finalPrice').innerText = finalPrice;
+              document.getElementById('selectedProducts').innerHTML = '';
+              document.getElementById('transactionForm').reset();
+          } catch (error) {
+              console.error("Error saving transaction:", error);
+          }
+      }
+
+      // Load transactions from the backend /transactions endpoint and display them
+      async function loadTransactions() {
+          try {
+              const response = await fetch('/transactions');
+              const transactions = await response.json();
+              const tableBody = document.getElementById('transactionsTable');
+              tableBody.innerHTML = '';
+
+              transactions.forEach(transaction => {
+                  const productNames = transaction.products.map(p => `${p.name} (${p.quantity}x)`).join(", ");
+                  const row = `
+                      <tr>
+                          <td>${transaction.invoiceId}</td>
+                          <td>${productNames}</td>
+                          <td>₹${transaction.finalPrice}</td>
+                          <td>${new Date(transaction.date).toLocaleString()}</td>
+                      </tr>
+                  `;
+                  tableBody.innerHTML += row;
+              });
+          } catch (error) {
+              console.error("Error loading transactions:", error);
+          }
+      }
+
+      document.getElementById('transactionForm').addEventListener('submit', saveTransaction);
+      loadProducts();
+      loadTransactions();
+  </script>
+</body>
+</html>

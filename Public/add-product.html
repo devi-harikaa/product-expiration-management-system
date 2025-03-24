@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="nav-menu">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/add-product.html">Add Product</a>
+        <a href="/view-products.html">View Products</a>
+        <a href="/notification.html">Notifications</a>
+        <a href="/transactions.html">Transactions</a>
+        <a href="/recommendations.html">Recommendations</a>
+        <a href="/product-management-system.html" onclick="logout()">Logout</a>
+    </div>
+
+    <div class="container">
+        <h1>Add Products via Excel</h1>
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="excelFile">Upload Excel File</label>
+                <input type="file" id="excelFile" accept=".xlsx" required>
+            </div>
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+
+    <script>
+        // Redirect to login if user is not logged in
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = '/login-page.html';
+        }
+
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('excelFile');
+            if (!fileInput.files.length) {
+                alert('Please select an Excel file.');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const response = await fetch('http://localhost:5000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                alert(result.message);
+                window.location.href = '/view-products.html';
+            } catch (error) {
+                alert('Error uploading file: ' + error.message);
+            }
+        });
+
+        function logout() {
+            window.location.href = '/product-management-system.html';
+        }
+    </script>
+</body>
+</html>

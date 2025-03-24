@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logout</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>You have been logged out.</h1>
+    <p>Redirecting to the login page...</p>
+  </div>
+  <script>
+    // Clear user data
+    localStorage.removeItem('currentUser');
+    // Redirect to login page after 3 seconds
+    setTimeout(() => {
+      window.location.href = '/login-page.html';
+    }, 3000);
+  </script>
+</body>
+</html>

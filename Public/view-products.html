@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Products</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="nav-menu">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/add-product.html">Add Product</a>
+        <a href="/view-products.html">View Products</a>
+        <a href="/notification.html">Notifications</a>
+        <a href="/transactions.html">Transactions</a>
+        <a href="/recommendations.html">Recommendations</a>
+        <a href="/product-management-system.html" onclick="logout()">Logout</a>
+    </div>
+
+    <div class="container">
+        <h1>All Products</h1>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Expiry Date</th>
+                    <th>Stock</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+                <!-- Products will be loaded here -->
+            </tbody>
+        </table>
+    </div>
+
+ <script>
+  async function fetchProducts() {
+    try {
+        const response = await fetch('http://localhost:5000/products');
+        let products = await response.json();
+
+        console.log("Fetched Products:", products);
+
+       
+        if (Object.keys(products[0])[0].includes('|')) {
+            products.shift(); // Remove the first entry
+        }
+
+        const tableBody = document.getElementById('productTableBody');
+        tableBody.innerHTML = ''; // Clear previous data
+
+        if (products.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="5">No products available</td></tr>';
+            return;
+        }
+
+        products.forEach(product => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${product.name || 'N/A'}</td>
+                <td>${product.category || 'N/A'}</td>
+                <td>${product.expiryDate || 'N/A'}</td>
+                <td>${product.stock || 'N/A'}</td>
+                <td>${product.price ? product.price.toFixed(2) : 'N/A'}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error("Error fetching products:", error);
+    }
+}
+
+fetchProducts();  // Call function on page load
+</script>
+</body>
+</html>

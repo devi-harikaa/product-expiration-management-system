@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications - Products Near Expiry</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .notification-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .notification-card h3 {
+      margin: 0 0 10px;
+    }
+    .notification-card p {
+      margin: 5px 0;
+    }
+    .filter-options {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-menu">
+    <a href="/dashboard.html">Dashboard</a>
+    <a href="/add-product.html">Add Product</a>
+    <a href="/view-products.html">View Products</a>
+    <a href="/notifications.html">Notifications</a>
+    <a href="/transactions.html">Transactions</a>
+    <a href="/recommendations.html">Recommendations</a>
+    <a href="/logout.html">Logout</a>
+  </div>
+
+  <div class="container">
+    <h1>Notifications - Products Near Expiry</h1>
+    
+    <div class="filter-options">
+      <label for="timeFilter">Filter by Time Until Expiry:</label>
+      <select id="timeFilter">
+        <option value="all" selected>All </option>
+        <option value="7">Less than 7 days</option>
+        <option value="10">Less than 10 days</option>
+        <option value="30">Less than 30 days</option>
+      </select>
+    </div>
+    
+    <div id="notificationsList">
+      <!-- Notifications will be loaded here -->
+    </div>
+  </div>
+
+  <script>
+    let allNotifications = [];
+
+    async function loadNotifications(days) {
+      try {
+        let url = '/notifications';
+        // Append days query parameter if a filter other than "all" is selected
+        if (days && days !== "all") {
+          url += `?days=${encodeURIComponent(days)}`;
+        }
+        const response = await fetch(url);
+        let expiringProducts = await response.json();
+        // Sort products by expiry date in ascending order
+        expiringProducts.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate));
+        allNotifications = expiringProducts;
+        displayNotifications(expiringProducts);
+      } catch (error) {
+        console.error("Error loading notifications:", error);
+        document.getElementById('notificationsList').innerHTML = "<p>Error loading notifications.</p>";
+      }
+    }
+
+    function displayNotifications(notifications) {
+      const container = document.getElementById('notificationsList');
+      if (!Array.isArray(notifications) || notifications.length === 0) {
+        container.innerHTML = "<p>No products expiring soon.</p>";
+        return;
+      }
+      container.innerHTML = notifications.map(product => `
+        <div class="notification-card">
+          <h3>${product.name}</h3>
+          <p><strong>Category:</strong> ${product.category}</p>
+          <p><strong>Expiry Date:</strong> ${product.expiryDate}</p>
+          <p><strong>Stock:</strong> ${product.stock}</p>
+          <p><strong>Price:</strong> ₹${product.price}</p>
+        </div>
+      `).join("");
+    }
+
+    // Listen for changes in the time filter dropdown and reload notifications accordingly
+    document.getElementById('timeFilter').addEventListener('change', function() {
+      const selectedFilter = this.value;
+      loadNotifications(selectedFilter);
+    });
+
+    // Initial load with default filter ("all")
+    loadNotifications("all");
+  </script>
+</body>
+</html>

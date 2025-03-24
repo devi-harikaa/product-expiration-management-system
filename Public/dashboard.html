@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .nav-menu {
+      background-color: var(--primary-color);
+      padding: 15px;
+      color: white;
+    }
+    .nav-menu a {
+      color: white;
+      text-decoration: none;
+      margin-right: 20px;
+    }
+    .dashboard-container {
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .notification {
+      border-bottom: 1px solid #ccc;
+      padding: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-menu">
+    <a href="/dashboard.html">Dashboard</a>
+    <a href="/add-product.html">Add Product</a>
+    <a href="/view-products.html">View Products</a>
+    <a href="/notifications.html">Notifications</a>
+    <a href="/transactions.html">Transactions</a>
+    <a href="/recommendations.html">Recommendations</a>
+    <a href="/logout.html">Logout</a>
+  </div>
+
+  <div class="dashboard-container">
+    <h1>Dashboard</h1>
+    
+    <div class="stats">
+      <div class="card">
+        <h3>Total Products</h3>
+        <p id="totalProducts">0</p>
+      </div>
+      <div class="card">
+        <h3>Low Stock Products</h3>
+        <p id="lowStock">0</p>
+      </div>
+      <div class="card">
+        <h3>Expiring Soon</h3>
+        <p id="expiringSoon">0</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Recent Notifications</h2>
+      <div id="recentNotifications">Loading notifications...</div>
+    </div>
+  </div>
+
+  <script>
+    // Redirect to login page if the user is not authenticated
+    if (!localStorage.getItem('currentUser')) {
+      window.location.href = '/login-page.html';
+    }
+
+    function logout() {
+      window.location.href = '/product-management-system.html';
+    }
+
+    // Fetch dashboard statistics from the backend's /dashboard endpoint
+    async function loadDashboardData() {
+      try {
+        const response = await fetch('/dashboard');
+        const data = await response.json();
+        document.getElementById('totalProducts').textContent = data.totalProducts;
+        document.getElementById('lowStock').textContent = data.lowStockCount;
+        document.getElementById('expiringSoon').textContent = data.expiringSoonCount;
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+      }
+    }
+
+    // Fetch recent notifications from the backend /notifications endpoint (default 30 days)
+    async function loadNotifications() {
+      try {
+        const response = await fetch('/notifications?days=30');
+        let notifications = await response.json();
+        // Sort notifications by expiry date in ascending order
+        notifications.sort((a, b) => new Date(a.expiryDate) - new Date(b.expiryDate));
+        const recentNotifs = notifications.slice(0, 5);
+        const notifsHtml = recentNotifs.map(n => `
+          <div class="notification">
+            <p>${n.name} is expiring on ${new Date(n.expiryDate).toLocaleDateString()}</p>
+          </div>
+        `).join('');
+        document.getElementById('recentNotifications').innerHTML = notifsHtml || "No recent notifications";
+      } catch (error) {
+        console.error("Error loading notifications:", error);
+      }
+    }
+
+    loadDashboardData();
+    loadNotifications();
+  </script>
+</body>
+</html>
+
+
