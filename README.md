@@ -27,8 +27,7 @@ This project is designed to **automate inventory management** for businesses dea
 3. Run the server:  
    ```bash
    npm start
-   ```  
-4. Access the dashboard via `http://localhost:3000`  
+   ```    
 
 #### **Contributing**  
 We welcome contributions! Feel free to submit issues or pull requests.  
