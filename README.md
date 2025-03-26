@@ -12,8 +12,9 @@ This project is designed to **automate inventory management** for businesses dea
 #### **Technology Stack**  
 - **Frontend:** HTML, CSS, JavaScript  
 - **Backend:** Node.js, Express  
-- **Database:** MongoDB/MySQL  
-- **Machine Learning:** Apriori Algorithm (Market Basket Analysis)  
+- **Database:** MongoDB/MySQL(for stroing the data){2 Tier}  
+- **Machine Learning:** Apriori Algorithm (Market Basket Analysis)
+- **Framework:** Twilio Sdk(alert message)
 
 #### **How to Use**  
 1. Clone the repository:  
